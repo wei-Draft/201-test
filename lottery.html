@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轉盤抽號</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; text-align: center; background: #f6f8fb; }
+        h1 { color: #333; margin-bottom: 10px; }
+        p { color: #555; margin-top: 0; }
+        .wheel-container { display: inline-block; position: relative; width: 340px; height: 340px; margin: 30px 0; }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; background: #eee; border: 6px solid #fff; box-shadow: 0 8px 20px rgba(0,0,0,.12); transition: transform 0.5s ease-out; position: relative; }
+        .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; width: 88px; height: 88px; margin: -44px; background: #fff; border-radius: 50%; box-shadow: inset 0 0 0 8px #f6f8fb; }
+        .pointer { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 26px solid #d32f2f; z-index: 2; }
+        .numbers { position: absolute; top: 50%; left: 50%; width: 100%; height: 100%; transform: translate(-50%, -50%); pointer-events: none; }
+        .numbers span { position: absolute; left: 50%; top: 50%; transform-origin: 0 0; color: #fff; font-weight: bold; font-size: 12px; text-shadow: 0 0 4px rgba(0,0,0,.6); }
+        button { padding: 12px 26px; font-size: 16px; background-color: #1976d2; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background-color .2s ease; }
+        button:hover { background-color: #115293; }
+        #result { margin-top: 20px; font-size: 28px; font-weight: bold; color: #d32f2f; min-height: 40px; }
+    </style>
+</head>
+<body>
+    <h1>轉盤抽號</h1>
+    <p>轉盤內含 1 到 23 號，按下按鈕開始抽號。</p>
+
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <div id="wheel" class="wheel">
+            <div class="numbers" id="numberLabels"></div>
+        </div>
+    </div>
+
+    <button onclick="spinWheel()">開始抽號</button>
+    <div id="result"></div>
+
+    <script>
+        const wheel = document.getElementById('wheel');
+        const result = document.getElementById('result');
+        const numberLabels = document.getElementById('numberLabels');
+        const numbers = Array.from({ length: 23 }, (_, i) => i + 1);
+        const sectorAngle = 360 / numbers.length;
+        const colors = ['#ff8a65', '#f06292', '#4fc3f7', '#81c784', '#ba68c8', '#ffd54f', '#4db6ac', '#9575cd', '#4fc3f7', '#f06292', '#ffb74d', '#64b5f6', '#ab47bc', '#aed581', '#ff8a65', '#7986cb', '#4db6ac', '#f06292', '#ffb74d', '#4fc3f7', '#81c784', '#ba68c8', '#ffd54f'];
+
+        function drawWheelBackground() {
+            const gradientSegments = numbers.map((_, index) => {
+                const start = index * sectorAngle;
+                const end = start + sectorAngle;
+                return `${colors[index % colors.length]} ${start}deg ${end}deg`;
+            });
+            wheel.style.background = `conic-gradient(${gradientSegments.join(', ')})`;
+        }
+
+        function createLabels() {
+            numbers.forEach((num, index) => {
+                const label = document.createElement('span');
+                const angle = index * sectorAngle + sectorAngle / 2;
+                label.textContent = num;
+                label.style.transform = `rotate(${angle}deg) translate(0, -142px) rotate(-${angle}deg)`;
+                numberLabels.appendChild(label);
+            });
+        }
+
+        function spinWheel() {
+            const selectedIndex = Math.floor(Math.random() * numbers.length);
+            const selected = numbers[selectedIndex];
+            const rotation = 360 * 5 - (selectedIndex * sectorAngle + sectorAngle / 2);
+            result.textContent = '';
+            wheel.style.transform = `rotate(${rotation}deg)`;
+
+            wheel.addEventListener('transitionend', function handler() {
+                result.textContent = '抽中：' + selected + ' 號';
+                wheel.removeEventListener('transitionend', handler);
+            });
+        }
+
+        drawWheelBackground();
+        createLabels();
+    </script>
+</body>
+</html></content>
+<parameter name="filePath">/workspaces/201-test/lottery.html
